@@ -13,10 +13,7 @@ if /I "%ARCH%"=="x64" (
 :: ----------------------------------------------------------------------
 :: Download URLs, local dirs and versions
 :: Lua
-set LUA_VER=53
-set LUA32_URL=http://downloads.sourceforge.net/luabinaries/lua-5.3.2_Win32_dllw4_lib.zip
-set LUA64_URL=http://downloads.sourceforge.net/luabinaries/lua-5.3.2_Win64_dllw4_lib.zip
-set LUA_URL=!LUA%BIT%_URL!
+set LUA_VER=51
 set LUA_DIR=C:\Lua
 :: Perl
 set PERL_VER=524
@@ -34,19 +31,10 @@ set PYTHON3_VER=35
 set PYTHON3_32_DIR=C:\python%PYTHON3_VER%
 set PYTHON3_64_DIR=C:\python%PYTHON3_VER%-x64
 set PYTHON3_DIR=!PYTHON3_%BIT%_DIR!
-:: Racket
-set RACKET_VER=3m_a0solc
-set RACKET32_URL=https://mirror.racket-lang.org/releases/6.6/installers/racket-minimal-6.6-i386-win32.exe
-set RACKET64_URL=https://mirror.racket-lang.org/releases/6.6/installers/racket-minimal-6.6-x86_64-win32.exe
-set RACKET_URL=!RACKET%BIT%_URL!
-set RACKET32_DIR=%PROGRAMFILES(X86)%\Racket
-set RACKET64_DIR=%PROGRAMFILES%\Racket
-set RACKET_DIR=!RACKET%BIT%_DIR!
-set MZSCHEME_VER=%RACKET_VER%
 :: Ruby
-set RUBY_VER=22
-set RUBY_VER_LONG=2.2.0
-set RUBY_BRANCH=ruby_2_2
+set RUBY_VER=23
+set RUBY_VER_LONG=2.3.0
+set RUBY_BRANCH=ruby_2_3
 set RUBY32_DIR=C:\Ruby%RUBY_VER%
 set RUBY64_DIR=C:\Ruby%RUBY_VER%-x64
 set RUBY_DIR=!RUBY%BIT%_DIR!
@@ -61,12 +49,12 @@ set TCL_DIR=C:\Tcl
 set GETTEXT32_URL=https://github.com/mlocati/gettext-iconv-windows/releases/download/v0.19.6-v1.14/gettext0.19.6-iconv1.14-shared-32.exe
 set GETTEXT64_URL=https://github.com/mlocati/gettext-iconv-windows/releases/download/v0.19.6-v1.14/gettext0.19.6-iconv1.14-shared-64.exe
 set GETTEXT_URL=!GETTEXT%BIT%_URL!
-:: UPX
-set UPX_URL=http://upx.sourceforge.net/download/upx391w.zip
+SET MSVCVER=14.0
+
 :: ----------------------------------------------------------------------
 
 :: Update PATH
-path %PYTHON_DIR%;%PYTHON3_DIR%;%PERL_DIR%\bin;%path%;%LUA_DIR%;%TCL_DIR%\bin;%RUBY_DIR%\bin;%RACKET_DIR%;%RACKET_DIR%\lib
+path %PYTHON_DIR%;%PYTHON3_DIR%;%PERL_DIR%\bin;%path%;%LUA_DIR%;%TCL_DIR%\bin;%RUBY_DIR%\bin
 
 if /I "%1"=="" (
   set target=build
@@ -83,20 +71,31 @@ exit 1
 :install_x64
 :: ----------------------------------------------------------------------
 @echo on
+:: Work around for Python 2.7.11
+reg copy HKLM\SOFTWARE\Python\PythonCore\2.7 HKLM\SOFTWARE\Python\PythonCore\2.7-32 /s /reg:32
+reg copy HKLM\SOFTWARE\Python\PythonCore\2.7 HKLM\SOFTWARE\Python\PythonCore\2.7-32 /s /reg:64
 
 :: Get Vim source code
-git submodule update --init
+git clone https://github.com/vim/vim.git -b master -q
 
 :: Apply experimental patches
 pushd vim
-for %%i in (..\patch\*.patch) do git apply -v %%i
+for /f %%a in ('git describe --tags  --abbrev^=0') do set TAG_NAME=%%a
+git checkout %TAG_NAME%
 popd
 
 if not exist downloads mkdir downloads
 
 :: Lua
-call :downloadfile %LUA_URL% downloads\lua.zip
-7z x downloads\lua.zip -o%LUA_DIR% > nul || exit 1
+git clone https://github.com/LuaJIT/LuaJIT.git -b master --depth 1 -q ../lua
+pushd ..\lua\src
+call msvcbuild.bat
+echo on
+Robocopy . %LUA_DIR%\include lauxlib.h lua.h lua.hpp luaconf.h lualib.h luajit.h
+Robocopy . %LUA_DIR%\bin lua%LUA_VER%.dll luajit.exe
+Robocopy . %LUA_DIR%\lib lua%LUA_VER%.lib
+Robocopy /E jit %LUA_DIR%\bin\lua\jit /XF .gitignore
+popd
 
 :: Perl
 call :downloadfile %PERL_URL% downloads\perl.zip
@@ -118,52 +117,53 @@ nmake .config.h.time
 xcopy /s .ext\include %RUBY_DIR%\include\ruby-%RUBY_VER_LONG%
 popd
 
-:: Racket
-call :downloadfile %RACKET_URL% downloads\racket.exe
-start /wait downloads\racket.exe /S
+:: Vimproc
+git clone https://github.com/Shougo/vimproc.vim.git -b master --depth 1 -q ../vimproc
+pushd ..\vimproc
+call nmake /F Make_msvc.mak nodebug=1
+echo on
+popd
+
+:: tellenc
+git clone https://github.com/adah1972/tellenc.git -b master --depth 1 -q ../tellenc
+pushd ..\tellenc
+call cl /EHsc /Ox tellenc.cpp
+echo on
+popd
 
 :: Install libintl.dll and iconv.dll
 call :downloadfile %GETTEXT_URL% downloads\gettext.exe
 start /wait downloads\gettext.exe /verysilent /dir=c:\gettext
-:: libwinpthread is needed on Win64 for localizing messages
-::copy c:\gettext\libwinpthread-1.dll ..\runtime
 
-:: Install UPX
-call :downloadfile %UPX_URL% downloads\upx.zip
-7z e downloads\upx.zip *\upx.exe -ovim\nsis > nul || exit 1
-
+::Plug
+call :downloadfile %PERL_URL% downloads\perl.zip
+git clone https://github.com/junegunn/vim-plug.git -b master --depth 1 -q ../vim-plug
 :: Show PATH for debugging
 path
-
-:: Install additional packages for Racket
-raco pkg install --auto r5rs-lib
-@echo off
-goto :eof
-
 
 :build_x86
 :build_x64
 :: ----------------------------------------------------------------------
 @echo on
+
 cd vim\src
 :: Remove progress bar from the build log
 sed -e "s/\$(LINKARGS2)/\$(LINKARGS2) | sed -e 's#.*\\\\r.*##'/" Make_mvc.mak > Make_mvc2.mak
 :: Build GUI version
 nmake -f Make_mvc2.mak ^
-	GUI=yes OLE=yes DIRECTX=yes ^
-	FEATURES=HUGE IME=yes MBYTE=yes ICONV=yes DEBUG=no ^
+	GUI=yes OLE=yes DIRECTX=yes^
+	FEATURES=HUGE IME=yes GIME=yes MBYTE=yes ICONV=yes DEBUG=no ^
 	DYNAMIC_PERL=yes PERL=%PERL_DIR% ^
 	DYNAMIC_PYTHON=yes PYTHON=%PYTHON_DIR% ^
 	DYNAMIC_PYTHON3=yes PYTHON3=%PYTHON3_DIR% ^
 	DYNAMIC_LUA=yes LUA=%LUA_DIR% ^
 	DYNAMIC_TCL=yes TCL=%TCL_DIR% ^
 	DYNAMIC_RUBY=yes RUBY=%RUBY_DIR% RUBY_MSVCRT_NAME=msvcrt ^
-	DYNAMIC_MZSCHEME=yes "MZSCHEME=%RACKET_DIR%" ^
 	WINVER=0x500 ^
 	|| exit 1
 :: Build CUI version
 nmake -f Make_mvc2.mak ^
-	GUI=no OLE=no DIRECTX=no ^
+	GUI=no OLE=no DIRECTX=no^
 	FEATURES=HUGE IME=yes MBYTE=yes ICONV=yes DEBUG=no ^
 	DYNAMIC_PERL=yes PERL=%PERL_DIR% ^
 	DYNAMIC_PYTHON=yes PYTHON=%PYTHON_DIR% ^
@@ -171,7 +171,6 @@ nmake -f Make_mvc2.mak ^
 	DYNAMIC_LUA=yes LUA=%LUA_DIR% ^
 	DYNAMIC_TCL=yes TCL=%TCL_DIR% ^
 	DYNAMIC_RUBY=yes RUBY=%RUBY_DIR% RUBY_MSVCRT_NAME=msvcrt ^
-	DYNAMIC_MZSCHEME=yes "MZSCHEME=%RACKET_DIR%" ^
 	WINVER=0x500 ^
 	|| exit 1
 :: Build translations
@@ -181,6 +180,10 @@ popd
 
 :check_executable
 :: ----------------------------------------------------------------------
+copy "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\%ARCH%\Microsoft.VC140.CRT\vcruntime140.dll" .
+copy "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\%ARCH%\Microsoft.VC140.CRT\msvcp140.dll" .
+dir
+
 start /wait .\gvim -silent -register
 start /wait .\gvim -u NONE -c "redir @a | ver | 0put a | wq!" ver.txt
 type ver.txt
@@ -196,59 +199,32 @@ goto :eof
 :package_x64
 :: ----------------------------------------------------------------------
 @echo on
-cd vim\src
+cd vim
+for /f %%a in ('git describe --tags  --abbrev^=0') do set TAG_NAME=%%a
+cd src
 
-:: Build both 64- and 32-bit versions of gvimext.dll for the installer
-start /wait cmd /c "setenv /x64 && cd GvimExt && nmake clean all"
-move GvimExt\gvimext.dll GvimExt\gvimext64.dll
-start /wait cmd /c "setenv /x86 && cd GvimExt && nmake clean all"
 :: Create zip packages
-7z a ..\..\gvim_%APPVEYOR_REPO_TAG_NAME:v=%_%ARCH%_pdb.zip *.pdb
 copy /Y ..\README.txt ..\runtime
 copy /Y ..\vimtutor.bat ..\runtime
 copy /Y *.exe ..\runtime\
 copy /Y xxd\*.exe ..\runtime
 copy /Y tee\*.exe ..\runtime
-mkdir ..\runtime\GvimExt
-copy /Y GvimExt\gvimext*.dll ..\runtime\GvimExt\
-copy /Y GvimExt\README.txt   ..\runtime\GvimExt\
-copy /Y GvimExt\*.inf        ..\runtime\GvimExt\
-copy /Y GvimExt\*.reg        ..\runtime\GvimExt\
 copy /Y ..\..\diff.exe ..\runtime\
 copy /Y c:\gettext\libiconv*.dll ..\runtime\
 copy /Y c:\gettext\libintl-8.dll ..\runtime\
+:: copy /Y ..\..\..\vimproc\lib\*.dll ..\runtime\
+copy /Y ..\..\..\tellenc\*.exe ..\runtime\
+
+Robocopy /E %LUA_DIR%\bin ..\runtime\
 :: libwinpthread is needed on Win64 for localizing messages
 if exist c:\gettext\libwinpthread-1.dll copy /Y c:\gettext\libwinpthread-1.dll ..\runtime\
-set dir=vim%APPVEYOR_REPO_TAG_NAME:~1,1%%APPVEYOR_REPO_TAG_NAME:~3,1%
+set dir=vim%TAG_NAME:~1,1%%TAG_NAME:~3,1%
 mkdir ..\vim\%dir%
 xcopy ..\runtime ..\vim\%dir% /Y /E /V /I /H /R /Q
-7z a ..\..\gvim_%APPVEYOR_REPO_TAG_NAME:v=%_%ARCH%.zip ..\vim
+xcopy ..\..\..\vimproc ..\vim\.vim\bundle\vimproc.vim\  /Y /E /V /I /H /R /Q
+xcopy ..\..\..\vim-plug\plug.vim ..\vim\.vim\autoload\  /Y /E /V /I /H /R /Q
 
-:: Create x86 installer (Skip x64 installer)
-if /i "%ARCH%"=="x64" goto :eof
-c:\cygwin\bin\bash -lc "cd `cygpath '%APPVEYOR_BUILD_FOLDER%'`/vim/runtime/doc && touch ../../src/auto/config.mk && make uganda.nsis.txt"
-copy gvim.exe gvim_ole.exe
-copy vim.exe vimw32.exe
-copy tee\tee.exe teew32.exe
-copy xxd\xxd.exe xxdw32.exe
-copy install.exe installw32.exe
-copy uninstal.exe uninstalw32.exe
-pushd ..\nsis
-"C:\Program Files (x86)\NSIS\makensis" /DVIMRT=..\runtime gvim.nsi "/XOutFile ..\..\gvim_%APPVEYOR_REPO_TAG_NAME:v=%_%ARCH%.exe"
-popd
-
-@echo off
-goto :eof
-
-
-:test_x86
-:test_x64
-:: ----------------------------------------------------------------------
-@echo on
-cd vim\src\testdir
-nmake -f Make_dos.mak VIMPROG=..\gvim || exit 1
-nmake -f Make_dos.mak clean
-nmake -f Make_dos.mak VIMPROG=..\vim || exit 1
+7z a ..\..\gvim_%TAG_NAME:v=%_%ARCH%.zip ..\vim
 
 @echo off
 goto :eof
