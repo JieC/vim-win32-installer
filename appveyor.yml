@@ -37,17 +37,10 @@ artifacts:
   - path: gvim_*_x64.zip
     name: gVim_x64
 
-before_deploy:
-  - for /f "delims=" %%i in (gitlog.txt) do set GITLOG=%%i
-
 deploy:
   - provider: GitHub
     description: |
       Vim Windows build
-
-      ### Changes:
-
-      $(GITLOG)
 
       * [ActivePerl](http://www.activestate.com/activeperl/downloads) 5.24
       * [ActiveTcl](http://www.activestate.com/activetcl/downloads) 8.6
