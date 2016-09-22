@@ -9,7 +9,6 @@
 * [Python](https://www.python.org/downloads/) 2.7
 * [Python3](https://www.python.org/downloads/) 3.5
 * [RubyInstaller](http://rubyinstaller.org/downloads/) 2.3
-
 * [vimproc.vim](https://github.com/Shougo/vimproc.vim/)
 * [vim-plug](https://github.com/junegunn/vim-plug/)
 * [tellenc](https://github.com/adah1972/tellenc/)
