@@ -1,5 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/yx8e96p3mnb913jl?svg=true)](https://ci.appveyor.com/project/JieC/vim-win32-installer)
-
+[![Build status](https://ci.appveyor.com/api/projects/status/4yfq1c6f4al1l35t?svg=true)](https://ci.appveyor.com/project/JieC/vimx64)
 
 # Vim Win64 Archive
 
