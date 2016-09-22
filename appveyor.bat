@@ -71,9 +71,6 @@ exit 1
 :install_x64
 :: ----------------------------------------------------------------------
 @echo on
-:: Work around for Python 2.7.11
-reg copy HKLM\SOFTWARE\Python\PythonCore\2.7 HKLM\SOFTWARE\Python\PythonCore\2.7-32 /s /reg:32
-reg copy HKLM\SOFTWARE\Python\PythonCore\2.7 HKLM\SOFTWARE\Python\PythonCore\2.7-32 /s /reg:64
 
 :: Get Vim source code
 git clone https://github.com/vim/vim.git -b master -q
@@ -151,7 +148,7 @@ cd vim\src
 sed -e "s/\$(LINKARGS2)/\$(LINKARGS2) | sed -e 's#.*\\\\r.*##'/" Make_mvc.mak > Make_mvc2.mak
 :: Build GUI version
 nmake -f Make_mvc2.mak ^
-	GUI=yes OLE=yes DIRECTX=yes^
+	GUI=yes OLE=yes DIRECTX=yes ^
 	FEATURES=HUGE IME=yes GIME=yes MBYTE=yes ICONV=yes DEBUG=no ^
 	DYNAMIC_PERL=yes PERL=%PERL_DIR% ^
 	DYNAMIC_PYTHON=yes PYTHON=%PYTHON_DIR% ^
@@ -163,7 +160,7 @@ nmake -f Make_mvc2.mak ^
 	|| exit 1
 :: Build CUI version
 nmake -f Make_mvc2.mak ^
-	GUI=no OLE=no DIRECTX=no^
+	GUI=no OLE=no DIRECTX=no ^
 	FEATURES=HUGE IME=yes MBYTE=yes ICONV=yes DEBUG=no ^
 	DYNAMIC_PERL=yes PERL=%PERL_DIR% ^
 	DYNAMIC_PYTHON=yes PYTHON=%PYTHON_DIR% ^
@@ -180,9 +177,9 @@ popd
 
 :check_executable
 :: ----------------------------------------------------------------------
-copy "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\%ARCH%\Microsoft.VC140.CRT\vcruntime140.dll" .
-copy "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\%ARCH%\Microsoft.VC140.CRT\msvcp140.dll" .
-dir
+
+:: copy "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\%ARCH%\Microsoft.VC140.CRT\vcruntime140.dll" .
+:: copy "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\%ARCH%\Microsoft.VC140.CRT\msvcp140.dll" .
 
 start /wait .\gvim -silent -register
 start /wait .\gvim -u NONE -c "redir @a | ver | 0put a | wq!" ver.txt
