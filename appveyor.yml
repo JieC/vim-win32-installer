@@ -6,7 +6,7 @@ skip_non_tags: true
 environment:
   matrix:
     - ARCH: x64
-    - ARCH: x86
+    # - ARCH: x86
 
 matrix:
   fast_finish: true
@@ -19,7 +19,6 @@ build:
 
 before_build:
   - 'if /I "%ARCH%"=="x64" (set ARG=amd64) else (set ARG=x86)'
-  - 'copy "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include\Win32.Mak" "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include"'
   - 'set SDK_INCLUDE_DIR=C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include'
   - 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" %ARG%'
 #  - '"C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /%ARCH% /release' 
@@ -47,7 +46,7 @@ deploy:
       * [LuaJIT](http://luajit.org/download.html) 2.0.4
       * [Python](https://www.python.org/downloads/) 2.7
       * [Python3](https://www.python.org/downloads/) 3.5
-      * [RubyInstaller](http://rubyinstaller.org/downloads/) 2.2
+      * [RubyInstaller](http://rubyinstaller.org/downloads/) 2.3
 
       Make sure that you install the same architecture (32bit/64bit) that matches your Vim installation.
     auth_token:
