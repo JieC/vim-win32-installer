@@ -142,7 +142,7 @@ path
 :build_x64
 :: ----------------------------------------------------------------------
 @echo on
-
+copy vim.ico vim\src
 cd vim\src
 :: Remove progress bar from the build log
 sed -e "s/\$(LINKARGS2)/\$(LINKARGS2) | sed -e 's#.*\\\\r.*##'/" Make_mvc.mak > Make_mvc2.mak
