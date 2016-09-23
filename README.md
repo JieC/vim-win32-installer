@@ -11,3 +11,5 @@
 * [vimproc.vim](https://github.com/Shougo/vimproc.vim/)
 * [vim-plug](https://github.com/junegunn/vim-plug/)
 * [tellenc](https://github.com/adah1972/tellenc/)
+
+icon from [macvim](https://github.com/macvim-dev/macvim/blob/master/src/MacVim/icons/MacVim.icns)
