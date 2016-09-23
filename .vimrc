@@ -1,3 +1,4 @@
+
 set nocompatible               " Be iMproved
 set shortmess=atI " Quick start
 
@@ -7,33 +8,27 @@ if has('win32') || has('win64')
 endif
 
 call plug#begin('~/.vim/bundle')
-
-" Plug 'mhinz/vim-startify'
 Plug 'Valloric/YouCompleteMe'
 Plug 'Shougo/vimproc.vim'
 Plug 'Shougo/unite.vim'
 " Plug 'Shougo/denite.nvim'
 Plug 'morhetz/gruvbox'
-" Plug 'bling/vim-bufferline'
-Plug 'Shougo/neomru.vim'
+" Plug 'Shougo/neomru.vim'
 " Plug 'Shougo/unite-session'
 " Plug 'Shougo/neoyank.vim'
 Plug 'Shougo/vimshell.vim'
 Plug 'Shougo/vimfiler.vim'
-" Plug 'Shougo/neocomplete'
 Plug 'mbbill/undotree'
-" Plug 'altercation/vim-colors-solarized'
 Plug 'itchyny/lightline.vim'
 " Plug 'othree/yajs.vim' " js syntax
 " Plug 'gavocanov/vim-js-indent' " js indent
-" Plug 'scrooloose/syntastic'
-" Plug 'marijnh/tern_for_vim', { 'do': 'npm install' }
+Plug 'scrooloose/syntastic'
 " Plug 'junegunn/rainbow_parentheses.vim'
-" Plug 'nathanaelkane/vim-indent-guides'
+Plug 'nathanaelkane/vim-indent-guides'
 Plug 'tpope/vim-commentary'
 " Plug 'tpope/vim-surround'
 " Plug 'tpope/vim-repeat'
-" Plug 'mbbill/fencview'
+Plug 'mbbill/fencview'
 call plug#end()
 
 " ============ Encodeing ============
@@ -68,8 +63,8 @@ set noswapfile
 set nobackup
 
 " =========== Persistent Undo =======
-if !isdirectory('~/.vim/undo/')
-    silent call mkdir('~/.vim/undo', 'p')
+if !isdirectory(expand('~/.vim/undo/'))
+    silent call mkdir(expand('~/.vim/undo'), 'p')
 endif
 
 if has("persistent_undo")
@@ -111,27 +106,29 @@ colorscheme gruvbox
 set cursorline      " Highlight current line
 
 if has('gui_running')
-  if has('win32')
-      set guifont=Hack:h11
-      " set guifont=Envy_Code_R:h11
-      " set guifont=Consolas:h11
-      set rop=type:directx,gamma:1.0,contrast:0.5,level:1,geom:1,renmode:4,taamode:1
+  if has('win32') || has('win64')
+    set guifont=Hack:h11
+    " set guifont=Envy_Code_R:h11
+    " set guifont=Consolas:h11
+    set rop=type:directx,gamma:1.0,contrast:0.5,level:1,geom:1,renmode:4,taamode:1
     " set rop=type:directx,renmode:5,taamode:1
   else
     set guifont=Envy\ Code\ R\ 11
   endif
-  " set guioptions+=b
-  " set guioptions-=m                                 "tear off menu items
-  " set guioptions-=T
+  set guioptions-=b " disable horizontal scrollbar
+  set guioptions-=r " disable vertical scrollbar
+  set guioptions-=m " disable menu
+  set guioptions-=T " disable toolbar
 else
   set t_Co=256
   set title       " Set terminal title
 endif
-
+set textwidth=80
+set colorcolumn=+1
 " ================ Shortcut ==============
 
 " Change map leader to ","
-let mapleader = ","
+let mapleader=","
 
 " Quick edit and source vimrc
 nmap <leader>v :e $MYVIMRC<CR>
@@ -159,101 +156,114 @@ nnoremap [unite] <nop>
 nnoremap <silent> [unite]<space> :<C-u>Unite
   \ -buffer-name=files buffer file_mru bookmark file_rec/async<CR>
 
-let g:unite_source_history_yank_enable = 1
+let g:unite_source_history_yank_enable=1
 nnoremap <space>y :Unite history/yank<cr>
 nnoremap <space>s :Unite -quick-match buffer<cr>
 
 " =============== Speecific Language Settings ==========
 " python
 autocmd BufRead *.py nmap <F5> :!python "%"<CR>
-"let $PYTHONHOME='path\to\python'
-"let $PYTHONPATH='path\to\python\Lib'
 
 " Javascript
 autocmd FileType javascript setlocal shiftwidth=2 tabstop=2
 
 
-
-
-
-" "Note: This option must set it in .vimrc(_vimrc).  NOT IN .gvimrc(_gvimrc)!
-" " Use neocomplete.
-" let g:neocomplete#enable_at_startup = 1
-" " Use smartcase.
-" let g:neocomplete#enable_smart_case = 1
-" " Set minimum syntax keyword length.
-" let g:neocomplete#sources#syntax#min_keyword_length = 3
-" let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
-
-" " Define dictionary.
-" let g:neocomplete#sources#dictionary#dictionaries = {
-"   \ 'default' : '',
-"   \ 'vimshell' : $HOME.'/.vimshell_hist',
-"   \ 'scheme' : $HOME.'/.gosh_completions'
-"   \ }
-
-" " Define keyword.
-" if !exists('g:neocomplete#keyword_patterns')
-"   let g:neocomplete#keyword_patterns = {}
-" endif
-" let g:neocomplete#keyword_patterns['default'] = '\h\w*'
-
-" " Plugin key-mappings.
-" inoremap <expr><C-g>     neocomplete#undo_completion()
-" inoremap <expr><C-l>     neocomplete#complete_common_string()
-
-" " Recommended key-mappings.
-" " <CR>: close popup and save indent.
-" inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-" function! s:my_cr_function()
-"   return (pumvisible() ? "\<C-y>" : "" ) . "\<CR>"
-"   " For no inserting <CR> key.
-"   "return pumvisible() ? "\<C-y>" : "\<CR>"
-" endfunction
-" " <TAB>: completion.
-" inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-" " <C-h>, <BS>: close popup and delete backword char.
-" inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
-" inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
-" " Close popup by <Space>.
-" "inoremap <expr><Space> pumvisible() ? "\<C-y>" : "\<Space>"
-
-" Enable omni completion.
-autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-autocmd FileType javascript setlocal omnifunc=tern#Complete
-" autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-
-
-
-
-
-
-
 " ==Systastic
-
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 0
-let g:syntastic_check_on_wq = 0
-let g:syntastic_javascript_checkers = ['eslint']
-
-
+let g:syntastic_always_populate_loc_list=1
+let g:syntastic_auto_loc_list=1
+let g:syntastic_check_on_open=0
+let g:syntastic_check_on_wq=0
+let g:syntastic_javascript_checkers=['eslint']
+let g:syntastic_python_checkers=['prospector']
 
 if executable('pt')
-  " Use pt (the platinum searcher)
-  " https://github.com/monochromegane/the_platinum_searcher
+  let g:unite_source_grep_command='pt'
+	let g:unite_source_grep_default_opts='--nogroup --nocolor'
+	let g:unite_source_grep_recursive_opt=''
+  let g:unite_source_grep_encoding='utf-8'
 	let g:unite_source_rec_async_command =
-    \ ['pt', '--follow', '--nocolor', '--nogroup',
-		\  '--hidden', '-g', '']
-  let g:unite_source_grep_command = 'pt'
-	let g:unite_source_grep_default_opts = '--nogroup --nocolor'
-	let g:unite_source_grep_recursive_opt = ''
-  let g:unite_source_grep_encoding = 'utf-8'
+    \ ['pt', '--follow', '--nocolor', '--nogroup', '--hidden', '-g', '']
+elseif executable('sift')
+  let g:unite_source_grep_command='sift'
+  let g:unite_source_grep_default_opts='--binary-skip --no-color -n --no-group -s '
+  let g:unite_source_grep_recursive_opt=''
+  let g:unite_source_rec_async_command =
+    \ ['sift', '--follow', '--no-color', '--no-group', '--git', '--targets']
 endif
 
+" YouCompleteMe
+let g:ycm_server_python_interpreter='python'
+let g:ycm_autoclose_preview_window_after_completion=1
 let g:lightline = {
-  \ 'colorscheme': 'gruvbox',
-  \ }
+      \ 'colorscheme': 'gruvbox',
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ], [ 'fugitive', 'filename' ]],
+      \   'right': [ [ 'syntastic', 'lineinfo' ], ['percent'], [ 'fileformat', 'fileencoding', 'filetype' ] ]
+      \ },
+      \ 'component_function': {
+      \   'fugitive': 'LightLineFugitive',
+      \   'filename': 'LightLineFilename',
+      \   'fileformat': 'LightLineFileformat',
+      \   'filetype': 'LightLineFiletype',
+      \   'fileencoding': 'LightLineFileencoding',
+      \   'mode': 'LightLineMode',
+      \ },
+      \ 'component_expand': {
+      \   'syntastic': 'SyntasticStatuslineFlag',
+      \ },
+      \ 'component_type': {
+      \   'syntastic': 'error',
+      \ },
+      \ 'subseparator': { 'left': '|', 'right': '|' }
+      \ }
+
+function! LightLineModified()
+  return &ft =~ 'help' ? '' : &modified ? '+' : &modifiable ? '' : '-'
+endfunction
+
+function! LightLineReadonly()
+  return &ft !~? 'help' && &readonly ? 'RO' : ''
+endfunction
+
+function! LightLineFilename()
+  let fname = expand('%:t')
+  return &ft == 'vimfiler' ? vimfiler#get_status_string() :
+        \ &ft == 'unite' ? unite#get_status_string() :
+        \ &ft == 'vimshell' ? vimshell#get_status_string() :
+        \ ('' != LightLineReadonly() ? LightLineReadonly() . ' ' : '') .
+        \ ('' != fname ? fname : '[No Name]') .
+        \ ('' != LightLineModified() ? ' ' . LightLineModified() : '')
+endfunction
+
+function! LightLineFileformat()
+  return winwidth(0) > 70 ? &fileformat : ''
+endfunction
+
+function! LightLineFiletype()
+  return winwidth(0) > 70 ? (&filetype !=# '' ? &filetype : 'no ft') : ''
+endfunction
+
+function! LightLineFileencoding()
+  return winwidth(0) > 70 ? (&fenc !=# '' ? &fenc : &enc) : ''
+endfunction
+
+function! LightLineMode()
+  let fname = expand('%:t')
+  return &ft == 'unite' ? 'Unite' :
+        \ &ft == 'vimfiler' ? 'VimFiler' :
+        \ &ft == 'vimshell' ? 'VimShell' :
+        \ winwidth(0) > 60 ? lightline#mode() : ''
+endfunction
+
+augroup AutoSyntastic
+  autocmd!
+  autocmd BufWritePost *.c,*.cpp call s:syntastic()
+augroup END
+function! s:syntastic()
+  SyntasticCheck
+  call lightline#update()
+endfunction
+
+let g:unite_force_overwrite_statusline = 0
+let g:vimfiler_force_overwrite_statusline = 0
+let g:vimshell_force_overwrite_statusline = 0
