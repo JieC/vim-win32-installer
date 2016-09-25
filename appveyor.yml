@@ -36,8 +36,12 @@ artifacts:
   - path: gvim_*_x64.zip
     name: gVim_x64
 
+before_deploy:
+  - set TAG=v8.0.0008
+
 deploy:
   - provider: GitHub
+    tag: %TAG%
     description: |
       Vim Windows build
 
