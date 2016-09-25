@@ -1,7 +1,8 @@
-
 set nocompatible               " Be iMproved
 set shortmess=atI " Quick start
-
+lang mes en
+set langmenu=en
+let $LANG='en'
 if has('win32') || has('win64')
   " let $HOME=$VIM
   set runtimepath^=~/.vim
@@ -14,7 +15,6 @@ Plug 'Shougo/unite.vim'
 " Plug 'Shougo/denite.nvim'
 Plug 'morhetz/gruvbox'
 " Plug 'Shougo/neomru.vim'
-" Plug 'Shougo/unite-session'
 " Plug 'Shougo/neoyank.vim'
 Plug 'Shougo/vimshell.vim'
 Plug 'Shougo/vimfiler.vim'
@@ -64,7 +64,7 @@ set nobackup
 
 " =========== Persistent Undo =======
 if !isdirectory(expand('~/.vim/undo/'))
-    silent call mkdir(expand('~/.vim/undo'), 'p')
+  silent call mkdir(expand('~/.vim/undo'), 'p')
 endif
 
 if has("persistent_undo")
@@ -176,46 +176,39 @@ let g:syntastic_check_on_wq=0
 let g:syntastic_javascript_checkers=['eslint']
 let g:syntastic_python_checkers=['prospector']
 
-if executable('pt')
-  let g:unite_source_grep_command='pt'
-	let g:unite_source_grep_default_opts='--nogroup --nocolor'
+if executable('rg')
+  let g:unite_source_grep_command='rg'
+	let g:unite_source_grep_default_opts='--color=never --no-heading -n -S'
 	let g:unite_source_grep_recursive_opt=''
-  let g:unite_source_grep_encoding='utf-8'
 	let g:unite_source_rec_async_command =
-    \ ['pt', '--follow', '--nocolor', '--nogroup', '--hidden', '-g', '']
-elseif executable('sift')
-  let g:unite_source_grep_command='sift'
-  let g:unite_source_grep_default_opts='--binary-skip --no-color -n --no-group -s '
-  let g:unite_source_grep_recursive_opt=''
-  let g:unite_source_rec_async_command =
-    \ ['sift', '--follow', '--no-color', '--no-group', '--git', '--targets']
+    \ ['rg', '--follow', '--hidden', '--files', '-g', '']
 endif
 
 " YouCompleteMe
 let g:ycm_server_python_interpreter='python'
 let g:ycm_autoclose_preview_window_after_completion=1
 let g:lightline = {
-      \ 'colorscheme': 'gruvbox',
-      \ 'active': {
-      \   'left': [ [ 'mode', 'paste' ], [ 'fugitive', 'filename' ]],
-      \   'right': [ [ 'syntastic', 'lineinfo' ], ['percent'], [ 'fileformat', 'fileencoding', 'filetype' ] ]
-      \ },
-      \ 'component_function': {
-      \   'fugitive': 'LightLineFugitive',
-      \   'filename': 'LightLineFilename',
-      \   'fileformat': 'LightLineFileformat',
-      \   'filetype': 'LightLineFiletype',
-      \   'fileencoding': 'LightLineFileencoding',
-      \   'mode': 'LightLineMode',
-      \ },
-      \ 'component_expand': {
-      \   'syntastic': 'SyntasticStatuslineFlag',
-      \ },
-      \ 'component_type': {
-      \   'syntastic': 'error',
-      \ },
-      \ 'subseparator': { 'left': '|', 'right': '|' }
-      \ }
+  \ 'colorscheme': 'gruvbox',
+  \ 'active': {
+  \   'left': [ [ 'mode', 'paste' ], [ 'fugitive', 'filename' ]],
+  \   'right': [ [ 'syntastic', 'lineinfo' ], ['percent'], [ 'fileformat', 'fileencoding', 'filetype' ] ]
+  \ },
+  \ 'component_function': {
+  \   'fugitive': 'LightLineFugitive',
+  \   'filename': 'LightLineFilename',
+  \   'fileformat': 'LightLineFileformat',
+  \   'filetype': 'LightLineFiletype',
+  \   'fileencoding': 'LightLineFileencoding',
+  \   'mode': 'LightLineMode',
+  \ },
+  \ 'component_expand': {
+  \   'syntastic': 'SyntasticStatuslineFlag',
+  \ },
+  \ 'component_type': {
+  \   'syntastic': 'error',
+  \ },
+  \ 'subseparator': { 'left': '|', 'right': '|' }
+  \ }
 
 function! LightLineModified()
   return &ft =~ 'help' ? '' : &modified ? '+' : &modifiable ? '' : '-'
@@ -267,3 +260,6 @@ endfunction
 let g:unite_force_overwrite_statusline = 0
 let g:vimfiler_force_overwrite_statusline = 0
 let g:vimshell_force_overwrite_statusline = 0
+
+" source $VIMRUNTIME/delmenu.vim
+"
