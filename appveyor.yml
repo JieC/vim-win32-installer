@@ -37,11 +37,11 @@ artifacts:
     name: gVim_x64
 
 before_deploy:
-  - set TAG=v8.0.0008
+  - set /p TAG_NAME=<version.txt
 
 deploy:
   - provider: GitHub
-    tag: $(TAG)
+    tag: $(TAG_NAME)
     description: |
       Vim Windows build
 
