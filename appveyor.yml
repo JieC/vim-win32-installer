@@ -41,7 +41,7 @@ before_deploy:
 
 deploy:
   - provider: GitHub
-    tag: %TAG%
+    tag: $(TAG)
     description: |
       Vim Windows build
 
