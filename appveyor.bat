@@ -79,10 +79,10 @@ git clone https://github.com/vim/vim.git -b master -q
 pushd vim
 for /f %%a in ('git describe --tags  --abbrev^=0') do set TAG_NAME=%%a
 git checkout %TAG_NAME%
-echo %TAG_NAME%>version.txt
 type version.txt
 popd
 
+echo %TAG_NAME%>version.txt
 if not exist downloads mkdir downloads
 
 :: Lua
@@ -198,9 +198,8 @@ goto :eof
 :package_x64
 :: ----------------------------------------------------------------------
 @echo on
-cd vim
 set /p TAG_NAME=<version.txt
-cd src
+cd vim\src
 
 :: Create zip packages
 copy /Y ..\README.txt ..\runtime
