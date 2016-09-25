@@ -75,10 +75,12 @@ exit 1
 :: Get Vim source code
 git clone https://github.com/vim/vim.git -b master -q
 
-:: Apply experimental patches
+:: Get latest tag
 pushd vim
 for /f %%a in ('git describe --tags  --abbrev^=0') do set TAG_NAME=%%a
 git checkout %TAG_NAME%
+echo %TAG_NAME%>version.txt
+type version.txt
 popd
 
 if not exist downloads mkdir downloads
@@ -197,7 +199,7 @@ goto :eof
 :: ----------------------------------------------------------------------
 @echo on
 cd vim
-for /f %%a in ('git describe --tags  --abbrev^=0') do set TAG_NAME=%%a
+set /p TAG_NAME=<version.txt
 cd src
 
 :: Create zip packages
