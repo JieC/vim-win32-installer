@@ -37,7 +37,7 @@ artifacts:
     name: gVim_x64
 
 before_deploy:
-  - set /p TAG_NAME=<version.txt
+  - 'set /p TAG_NAME=<%APPVEYOR_BUILD_FOLDER%\version.txt'
 
 deploy:
   - provider: GitHub
