@@ -220,7 +220,7 @@ set dir=vim%TAG_NAME:~1,1%%TAG_NAME:~3,1%
 mkdir ..\vim\%dir%
 xcopy ..\runtime ..\vim\%dir% /Y /E /V /I /H /R /Q
 xcopy ..\..\..\vimproc ..\vim\.vim\bundle\vimproc.vim\  /Y /E /V /I /H /R /Q
-xcopy ..\..\..\vim-plug\plug.vim ..\vim\.vim\autoload\  /Y /E /V /I /H /R /Q
+xcopy ..\..\..\vim-plug\plug.vim ..\vim\.vim\autoload\  /Y /V /I /H /R /Q
 
 7z a ..\..\gvim_%TAG_NAME:v=%_%ARCH%.zip ..\vim
 
