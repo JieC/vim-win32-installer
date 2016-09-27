@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/4yfq1c6f4al1l35t?svg=true)](https://ci.appveyor.com/project/JieC/vimx64)
+[![Build status](https://ci.appveyor.com/api/projects/status/bcfb539hhyn02kp6?svg=true)](https://ci.appveyor.com/project/JieC/vim-win64)
 
 # Vim Win64
 
