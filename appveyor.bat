@@ -17,10 +17,10 @@ set LUA_VER=51
 set LUA_DIR=C:\Lua
 :: Perl
 set PERL_VER=524
-set PERL32_URL=http://downloads.activestate.com/ActivePerl/releases/5.24.0.2400/ActivePerl-5.24.0.2400-MSWin32-x86-64int-300560.zip
-set PERL64_URL=http://downloads.activestate.com/ActivePerl/releases/5.24.0.2400/ActivePerl-5.24.0.2400-MSWin32-x64-300558.zip
+set PERL32_URL=http://downloads.activestate.com/ActivePerl/releases/5.24.1.2402/ActivePerl-5.24.1.2402-MSWin32-x86-64int-401627.exe
+set PERL64_URL=http://downloads.activestate.com/ActivePerl/releases/5.24.1.2402/ActivePerl-5.24.1.2402-MSWin32-x64-401627.exe
 set PERL_URL=!PERL%BIT%_URL!
-set PERL_DIR=C:\Perl%PERL_VER%\perl
+set PERL_DIR=C:\ActivePerl
 :: Python2
 set PYTHON_VER=27
 set PYTHON_32_DIR=C:\python%PYTHON_VER%
@@ -97,9 +97,10 @@ Robocopy /E jit %LUA_DIR%\bin\lua\jit /XF .gitignore
 popd
 
 :: Perl
-call :downloadfile %PERL_URL% downloads\perl.zip
-7z x downloads\perl.zip -oC:\ > nul || exit 1
-for /d %%i in (C:\ActivePerl*) do move %%i C:\Perl%PERL_VER%
+call :downloadfile %PERL_URL% downloads\perl.exe
+mkdir c:\ActivePerlTemp
+start /wait downloads\perl.exe /extract:c:\ActivePerlTemp /exenoui /exenoupdates /quiet /norestart
+for /d %%i in (c:\ActivePerlTemp\*) do move %%i %PERL_DIR%
 
 :: Tcl
 call :downloadfile %TCL_URL% downloads\tcl.exe
